@@ -14,7 +14,7 @@ public class FritzBoxBusiness {
 
     private static Response.ErrorListener errorCallback;
 
-    public static void login(final Activity activity, final String host, final LoginCallback callback) {
+    public static void login(final Activity activity, final String host, final String password, final LoginCallback callback) {
         errorCallback = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -27,7 +27,7 @@ public class FritzBoxBusiness {
                 Log.d(FritzBoxBusiness.class.getName(), "Received challenge response: " + response);
                 String challenge = XmlParserHelper.parseChallenge(response);
                 Log.d(FritzBoxBusiness.class.getName(), "Got challenge: " + challenge);
-                final String challengeResponse = createChallengeResponse("pfeffer", challenge);
+                final String challengeResponse = createChallengeResponse(password, challenge);
                 Log.d(FritzBoxBusiness.class.getName(), "Got challengeResponse: " + challengeResponse);
 
                 FritzBoxDao.login(activity, host, challengeResponse, new Response.Listener<String>() {

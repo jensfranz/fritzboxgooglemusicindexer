@@ -158,7 +158,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     }
 
     private void doRequest() {
-        FritzBoxBusiness.login(this, "fritz.box", new FritzBoxBusiness.LoginCallback() {
+        FritzBoxBusiness.login(this, "fritz.box", "myPasswordFromForm", new FritzBoxBusiness.LoginCallback() {
             @Override
             public void loggedIn(String sid) {
                 mTextView.setText("Response is: " + sid);
