@@ -32,8 +32,9 @@ proguard/
 # Log Files
 *.log
 
-# AndroidStuido
+# AndroidStudio
 .idea/
 *.iml
 gradlew
 gradlew.bat
+gradle/
