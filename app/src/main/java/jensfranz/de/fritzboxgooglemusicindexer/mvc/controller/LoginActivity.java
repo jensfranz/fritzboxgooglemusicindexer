@@ -1,17 +1,18 @@
 package jensfranz.de.fritzboxgooglemusicindexer.mvc.controller;
 
-import android.os.Bundle;
 import android.text.TextUtils;
+
+import com.google.inject.Inject;
 
 import jensfranz.de.fritzboxgooglemusicindexer.R;
 import jensfranz.de.fritzboxgooglemusicindexer.business.FritzBoxBusiness;
-import jensfranz.de.fritzboxgooglemusicindexer.event.EventListener;
-import jensfranz.de.fritzboxgooglemusicindexer.event.EventManager;
 import jensfranz.de.fritzboxgooglemusicindexer.event.LoggedInEvent;
 import jensfranz.de.fritzboxgooglemusicindexer.event.SignInPressedEvent;
 import jensfranz.de.fritzboxgooglemusicindexer.mvc.model.FritzboxInformation;
 import jensfranz.de.fritzboxgooglemusicindexer.validator.FritzBoxInformationValidator;
 import roboguice.activity.RoboActivity;
+import roboguice.event.EventManager;
+import roboguice.event.Observes;
 import roboguice.inject.ContentView;
 
 
@@ -19,15 +20,10 @@ import roboguice.inject.ContentView;
  * A login screen that offers login via email/password.
  */
 @ContentView(R.layout.activity_login)
-public class LoginActivity extends RoboActivity implements EventListener {
+public class LoginActivity extends RoboActivity {
 
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        EventManager.registerListener(this);
-
-    }
+    @Inject
+    private EventManager eventManager;
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -60,22 +56,18 @@ public class LoginActivity extends RoboActivity implements EventListener {
         FritzBoxBusiness.login(this, "fritz.box", fritzboxInformation.getPassword(), new FritzBoxBusiness.LoginCallback() {
             @Override
             public void loggedIn(String sid) {
-                EventManager.fireEvent(new LoggedInEvent(true));
+                eventManager.fire(new LoggedInEvent(true));
             }
 
             @Override
             public void failed(String reason) {
-                EventManager.fireEvent(new LoggedInEvent(reason));
+                eventManager.fire(new LoggedInEvent(reason));
             }
         });
     }
 
-    @Override
-    public void eventOccured(Object event) {
-        if (event instanceof SignInPressedEvent) {
-            final SignInPressedEvent signInPressedEvent = (SignInPressedEvent) event;
-            attemptLogin(signInPressedEvent.getFritzboxInformation());
-        }
+    private void onSignPressed(@Observes final SignInPressedEvent signInPressedEvent) {
+        attemptLogin(signInPressedEvent.getFritzboxInformation());
     }
 }
 

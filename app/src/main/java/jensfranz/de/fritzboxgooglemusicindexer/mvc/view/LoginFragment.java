@@ -16,17 +16,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.inject.Inject;
+
 import jensfranz.de.fritzboxgooglemusicindexer.R;
-import jensfranz.de.fritzboxgooglemusicindexer.event.EventListener;
-import jensfranz.de.fritzboxgooglemusicindexer.event.EventManager;
 import jensfranz.de.fritzboxgooglemusicindexer.event.LoggedInEvent;
 import jensfranz.de.fritzboxgooglemusicindexer.event.SignInPressedEvent;
 import jensfranz.de.fritzboxgooglemusicindexer.mvc.model.FritzboxInformation;
 import jensfranz.de.fritzboxgooglemusicindexer.validator.FritzBoxInformationValidator;
+import roboguice.event.EventManager;
+import roboguice.event.Observes;
 import roboguice.fragment.provided.RoboFragment;
 import roboguice.inject.InjectView;
 
-public class LoginFragment extends RoboFragment implements EventListener {
+public class LoginFragment extends RoboFragment {
 
     @InjectView(R.id.email)
     private AutoCompleteTextView mEmailView;
@@ -46,15 +48,8 @@ public class LoginFragment extends RoboFragment implements EventListener {
     @InjectView(R.id.email_sign_in_button)
     private Button mEmailSignInButton;
 
-    public LoginFragment() {
-        // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventManager.registerListener(this);
-    }
+    @Inject
+    private EventManager eventManager;
 
     private FritzboxInformation getFritzboxInformation() {
         final FritzboxInformation fritzboxInformation = new FritzboxInformation();
@@ -115,7 +110,7 @@ public class LoginFragment extends RoboFragment implements EventListener {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    EventManager.fireEvent(new SignInPressedEvent(getFritzboxInformation()));
+                    eventManager.fire(new SignInPressedEvent(getFritzboxInformation()));
                     attemptLogin();
                     return true;
                 }
@@ -127,22 +122,18 @@ public class LoginFragment extends RoboFragment implements EventListener {
             @Override
             public void onClick(View view) {
                 attemptLogin();
-                EventManager.fireEvent(new SignInPressedEvent(getFritzboxInformation()));
+                eventManager.fire(new SignInPressedEvent(getFritzboxInformation()));
             }
         });
     }
 
-    @Override
-    public void eventOccured(Object event) {
-        if (event instanceof LoggedInEvent) {
-            final LoggedInEvent loggedInEvent = (LoggedInEvent) event;
-            if (loggedInEvent.isSuccess()) {
-                mTextView.setText("Request sent.");
-                showProgress(false);
-            } else {
-                mTextView.setText("Failed: " + loggedInEvent.getFailureReason());
-                showProgress(false);
-            }
+    private void onLoggedIn(@Observes final LoggedInEvent loggedInEvent) {
+        if (loggedInEvent.isSuccess()) {
+            mTextView.setText("Request sent.");
+            showProgress(false);
+        } else {
+            mTextView.setText("Failed: " + loggedInEvent.getFailureReason());
+            showProgress(false);
         }
     }
 
