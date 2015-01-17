@@ -1,6 +1,5 @@
 package jensfranz.de.fritzboxgooglemusicindexer.mvc.controller;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -12,17 +11,19 @@ import jensfranz.de.fritzboxgooglemusicindexer.event.LoggedInEvent;
 import jensfranz.de.fritzboxgooglemusicindexer.event.SignInPressedEvent;
 import jensfranz.de.fritzboxgooglemusicindexer.mvc.model.FritzboxInformation;
 import jensfranz.de.fritzboxgooglemusicindexer.validator.FritzBoxInformationValidator;
+import roboguice.activity.RoboActivity;
+import roboguice.inject.ContentView;
 
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends Activity implements EventListener {
+@ContentView(R.layout.activity_login)
+public class LoginActivity extends RoboActivity implements EventListener {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
         EventManager.registerListener(this);
 

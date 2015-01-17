@@ -3,7 +3,6 @@ package jensfranz.de.fritzboxgooglemusicindexer.mvc.view;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Fragment;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -24,14 +23,28 @@ import jensfranz.de.fritzboxgooglemusicindexer.event.LoggedInEvent;
 import jensfranz.de.fritzboxgooglemusicindexer.event.SignInPressedEvent;
 import jensfranz.de.fritzboxgooglemusicindexer.mvc.model.FritzboxInformation;
 import jensfranz.de.fritzboxgooglemusicindexer.validator.FritzBoxInformationValidator;
+import roboguice.fragment.provided.RoboFragment;
+import roboguice.inject.InjectView;
 
-public class LoginFragment extends Fragment implements EventListener {
+public class LoginFragment extends RoboFragment implements EventListener {
 
+    @InjectView(R.id.email)
     private AutoCompleteTextView mEmailView;
+
+    @InjectView(R.id.password)
     private EditText mPasswordView;
+
+    @InjectView(R.id.text)
     private TextView mTextView;
+
+    @InjectView(R.id.login_progress)
     private View mProgressView;
+
+    @InjectView(R.id.login_form)
     private View mLoginFormView;
+
+    @InjectView(R.id.email_sign_in_button)
+    private Button mEmailSignInButton;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -92,19 +105,12 @@ public class LoginFragment extends Fragment implements EventListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_login, container, false);
+    }
 
-        final View view = inflater.inflate(R.layout.fragment_login, container, false);
-
-        // Set up the login form.
-        mEmailView = (AutoCompleteTextView) view.findViewById(R.id.email);
-
-        mPasswordView = (EditText) view.findViewById(R.id.password);
-
-        mTextView = (TextView) view.findViewById(R.id.text);
-
-        mLoginFormView = view.findViewById(R.id.login_form);
-        mProgressView = view.findViewById(R.id.login_progress);
-
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -117,7 +123,6 @@ public class LoginFragment extends Fragment implements EventListener {
             }
         });
 
-        final Button mEmailSignInButton = (Button) view.findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,8 +130,6 @@ public class LoginFragment extends Fragment implements EventListener {
                 EventManager.fireEvent(new SignInPressedEvent(getFritzboxInformation()));
             }
         });
-
-        return view;
     }
 
     @Override
